@@ -276,7 +276,7 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.gossip</groupId>
-        <artifactId>gossip-slf4j</artifactId>
+        <artifactId>gossip-core</artifactId>
         <version>${gossipVersion}</version>
       </dependency>
       <dependency>

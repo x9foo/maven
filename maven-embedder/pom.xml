@@ -76,7 +76,7 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.gossip</groupId>
-      <artifactId>gossip-slf4j</artifactId>
+      <artifactId>gossip-core</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
