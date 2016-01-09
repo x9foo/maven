@@ -82,12 +82,10 @@
     <dependency>
       <groupId>org.sonatype.gossip</groupId>
       <artifactId>gossip-extra</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
-      <optional>true</optional>
     </dependency>
     <!-- CLI -->
     <dependency>
