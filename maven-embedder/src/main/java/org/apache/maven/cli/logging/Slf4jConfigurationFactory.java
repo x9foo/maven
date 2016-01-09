@@ -19,61 +19,19 @@ package org.apache.maven.cli.logging;
  * under the License.
  */
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.maven.cli.logging.impl.UnsupportedSlf4jBindingConfiguration;
-import org.codehaus.plexus.util.PropertyUtils;
+import org.apache.maven.cli.logging.impl.GossipConfiguration;
 import org.slf4j.ILoggerFactory;
 
 /**
- * Slf4jConfiguration factory, loading implementations from <code>META-INF/maven/slf4j-configuration.properties</code>
- * configuration files in class loader: key is the class name of the ILoggerFactory, value is the class name of
- * the corresponding Slf4jConfiguration.
+ * Slf4jConfiguration factory that just "hides" the Gossip from MavenCli.
  *
  * @author Hervé Boutemy
  * @since 3.1.0
  */
 public class Slf4jConfigurationFactory
 {
-    public static final String RESOURCE = "META-INF/maven/slf4j-configuration.properties";
-
     public static Slf4jConfiguration getConfiguration( ILoggerFactory loggerFactory )
     {
-        Map<URL, Set<Object>> supported = new LinkedHashMap<>();
-
-        String slf4jBinding = loggerFactory.getClass().getCanonicalName();
-
-        try
-        {
-            Enumeration<URL> resources = Slf4jConfigurationFactory.class.getClassLoader().getResources( RESOURCE );
-
-            while ( resources.hasMoreElements() )
-            {
-                URL resource = resources.nextElement();
-
-                Properties conf = PropertyUtils.loadProperties( resource.openStream() );
-
-                String impl = conf.getProperty( slf4jBinding );
-
-                if ( impl != null )
-                {
-                    return (Slf4jConfiguration) Class.forName( impl ).newInstance();
-                }
-
-                supported.put( resource, conf.keySet() );
-            }
-        }
-        catch ( IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e )
-        {
-            e.printStackTrace();
-        }
-
-        return new UnsupportedSlf4jBindingConfiguration( slf4jBinding, supported );
+        return new GossipConfiguration();
     }
 }

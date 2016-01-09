@@ -19,45 +19,44 @@ package org.apache.maven.cli.logging.impl;
  * under the License.
  */
 
+import org.sonatype.gossip.Gossip;
+import org.sonatype.gossip.Gossip.LoggerImpl;
+
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
-import org.slf4j.MavenSlf4jFriend;
-import org.slf4j.impl.MavenSlf4jSimpleFriend;
 
 /**
- * Configuration for slf4j-simple.
+ * Configuration for gossip-slf4j.
  *
- * @author Hervé Boutemy
- * @since 3.1.0
+ * @author Tamas Cservenak
+ * @since 3.3.9
  */
-public class Slf4jSimpleConfiguration
+public class GossipConfiguration
     extends BaseSlf4jConfiguration
 {
+    org.sonatype.gossip.Level value = org.sonatype.gossip.Level.INFO;
+
     @Override
     public void setRootLoggerLevel( Level level )
     {
-        String value;
         switch ( level )
         {
             case DEBUG:
-                value = "debug";
+                value = org.sonatype.gossip.Level.DEBUG;
                 break;
 
-            case INFO:
-                value = "info";
+            case ERROR:
+                value = org.sonatype.gossip.Level.ERROR;
                 break;
 
             default:
-                value = "error";
-                break;
+                throw new IllegalArgumentException( "Unknown level:" + level );
         }
-        System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", value );
     }
 
     @Override
     public void activate()
     {
-        // property for root logger level or System.out redirection need to be taken into account
-        MavenSlf4jFriend.reset();
-        MavenSlf4jSimpleFriend.init();
+        LoggerImpl root = Gossip.getInstance().getRoot();
+        root.setLevel( value );
     }
 }
