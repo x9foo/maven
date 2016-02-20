@@ -37,6 +37,9 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Logs execution events to logger, eventually user-supplied.
  *
@@ -47,19 +50,22 @@ public class ExecutionEventLogger
 {
     private final Logger logger;
 
+    private final Map<MavenProject, Integer> projectNumbers;
+
     private static final int LINE_LENGTH = 72;
     private static final int MAX_PADDED_BUILD_TIME_DURATION_LENGTH = 9;
     private static final int MAX_PROJECT_NAME_LENGTH = 52;
 
     public ExecutionEventLogger()
     {
-        logger = LoggerFactory.getLogger( ExecutionEventLogger.class );
+        this( LoggerFactory.getLogger( ExecutionEventLogger.class ) );
     }
 
     // TODO should we deprecate?
     public ExecutionEventLogger( Logger logger )
     {
         this.logger = Validate.notNull( logger, "logger cannot be null" );
+        projectNumbers = new HashMap();
     }
 
     private static String chars( char c, int count )
@@ -94,9 +100,12 @@ public class ExecutionEventLogger
 
             logger.info( "" );
 
+            int i = 1;
+
             for ( MavenProject project : event.getSession().getProjects() )
             {
-                logger.info( project.getName() );
+                logger.info( "[" + i + "] " + project.getName() );
+                projectNumbers.put( project, i++ );
             }
         }
     }
@@ -133,6 +142,11 @@ public class ExecutionEventLogger
         {
             StringBuilder buffer = new StringBuilder( 128 );
 
+            Integer i = projectNumbers.get( project );
+            if ( i != null )
+            {
+                buffer.append( "[" + i + "] " );
+            }
             buffer.append( project.getName() );
             buffer.append( ' ' );
 
@@ -240,8 +254,20 @@ public class ExecutionEventLogger
             logger.info( chars( ' ', LINE_LENGTH ) );
             logger.info( chars( '-', LINE_LENGTH ) );
 
-            logger.info( "Building " + event.getProject().getName() + " " + event.getProject().getVersion() );
+            String progress = "";
+            int total = event.getSession().getProjects().size();
+            MavenProject project = event.getProject();
 
+            if ( total > 1 )
+            {
+                Integer current = projectNumbers.get( project );
+                if ( current != null )
+                {
+                    progress = "[" + current  + "/" + total + "] ";
+                }
+            }
+
+            logger.info( progress + "Building " + project.getName() + " " + project.getVersion() );
             logger.info( chars( '-', LINE_LENGTH ) );
         }
     }
